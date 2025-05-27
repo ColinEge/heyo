@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Heyo</title>
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+    <img id="soundImage" src="images/image.png" alt="Clickable Image" style="cursor:pointer; width:100%; height:auto;">
+    <audio id="clickSound" src="./noise.mp3"></audio>
+    <script>
+        // Register the Service Worker
+        window.addEventListener('load', () => {
+            registerSW();
+        });
+        async function registerSW() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    await navigator
+                        .serviceWorker
+                        .register('serviceworker.js');
+                }
+                catch (e) {
+                    console.log('SW registration failed');
+                }
+            }
+        }
+
+        // Make sound when click
+        const img = document.getElementById('soundImage');
+        const sound = document.getElementById('clickSound');
+        img.addEventListener('click', () => {
+            sound.currentTime = 0;
+            sound.play();
+        });
+    </script>
+</body>
+
+</html>

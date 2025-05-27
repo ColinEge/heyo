@@ -1,0 +1,37 @@
+{
+    "name":"Kissy",
+    "short_name":"Kissy",
+    "start_url":"index.html",
+    "display":"standalone",
+    "background_color":"#5900b3",
+    "theme_color":"black",
+    "scope": ".",
+    "description":"Kissy.",
+    "icons":[
+    {
+    "src":"images/icon-192x192.png",                      
+    "sizes":"192x192",
+    "type":"image/png"
+    },
+    {
+    "src":"images/icon-512x512.png",
+    "sizes":"512x512",
+    "type":"image/png"
+    }
+  ],
+  "screenshots": [
+    {
+     "src": "image.png",
+      "sizes": "750x750",
+      "type": "images/image.png",
+      "form_factor": "wide",
+      "label": "Kissy Heart"
+    },
+    {
+     "src": "image.png",
+      "sizes": "750x750",
+      "type": "images/image.png",
+      "label": "Kissy Heart"
+    }
+]
+}
