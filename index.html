@@ -4,10 +4,28 @@
 <head>
     <title>Heyo</title>
     <link rel="manifest" href="manifest.json">
+    <style>
+        body, html {
+            height: 100vh;
+            margin: 0;
+        }
+        .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #soundImage {
+            width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 
 <body>
-    <img id="soundImage" src="images/image.png" alt="Clickable Image" style="cursor:pointer; width:100%; height:auto;">
+    <div class="center-container">
+        <img id="soundImage" src="images/image.png" alt="Clickable Image" style="cursor:pointer;">
+    </div>
     <audio id="clickSound" src="./noise.mp3"></audio>
     <script>
         // Register the Service Worker

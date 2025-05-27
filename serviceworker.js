@@ -17,8 +17,17 @@ self.addEventListener("install", function (e) {
 
 self.addEventListener("fetch", function (event) {
   event.respondWith(
-    caches.match(event.request).then(function (response) {
-      return response || fetch(event.request);
-    })
+    fetch(event.request)
+      .then(function (response) {
+        // Optionally update the cache with the latest version
+        return caches.open(staticCacheName).then(function (cache) {
+          cache.put(event.request, response.clone());
+          return response;
+        });
+      })
+      .catch(function () {
+        // If network fails, try to serve from cache
+        return caches.match(event.request);
+      })
   );
 });
