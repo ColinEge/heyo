@@ -1,0 +1,7 @@
+{
+  "name": "heyo-app",
+  "type": "commonjs",
+  "dependencies": {
+    "google-auth-library": "^9.0.0"
+  }
+}

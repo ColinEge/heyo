@@ -1,58 +1,57 @@
 <!DOCTYPE html>
 <html>
 
+
 <head>
     <title>Heyo</title>
     <link rel="manifest" href="manifest.json">
-    <style>
-        body, html {
-            height: 100vh;
-            margin: 0;
-        }
-        .center-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        #soundImage {
-            width: 100%;
-            height: auto;
-        }
-    </style>
+
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="center-container">
-        <img id="soundImage" src="images/image.png" alt="Clickable Image" style="cursor:pointer;">
-    </div>
-    <audio id="clickSound" src="./noise.mp3"></audio>
-    <script>
-        // Register the Service Worker
-        window.addEventListener('load', () => {
-            registerSW();
-        });
-        async function registerSW() {
-            if ('serviceWorker' in navigator) {
-                try {
-                    await navigator
-                        .serviceWorker
-                        .register('serviceworker.js');
-                }
-                catch (e) {
-                    console.log('SW registration failed');
-                }
-            }
-        }
+    <main>
+        <audio id="clickSound" src="./noise.mp3"></audio>
+        <div id="homeSection">
+            <div class="center-container">
+                <img id="soundImage" src="images/image.png" alt="Clickable Image" style="cursor:pointer;">
+            </div>
+        </div>
 
-        // Make sound when click
-        const img = document.getElementById('soundImage');
-        const sound = document.getElementById('clickSound');
-        img.addEventListener('click', () => {
-            sound.currentTime = 0;
-            sound.play();
-        });
-    </script>
+        <div id="kisseeSection" style="display:none;">
+            <h2>Add a Kissee</h2>
+            <input type="email" id="kisseeEmail" placeholder="Kissee's email" />
+            <input type="password" id="kisseePass" placeholder="Kissee's secret" />
+            <button id="addKisseeBtn">Add Kissee</button>
+            <p id="kisseeStatus"></p>
+
+            <h2>Your Kissees</h2>
+            <ul id="kisseeList"></ul>
+        </div>
+
+        <div id="settingsSection" style="display:none;">
+            <p id="userInfo"></p>
+
+            <input type="password" id="secretInput" placeholder="Enter secret" />
+            <button id="savePassBtn">Save</button>
+            <button id="clearPassBtn">Clear</button>
+            <p><strong>Your FCM Token:</strong></p>
+            <p id="tokenDisplay" style="word-break: break-word;"></p>
+        </div>
+    </main>
+
+    <nav id="nav">
+        <button id="signInBtn">Sign in with Google</button>
+        <button id="toHome" style="display:none;">Home</button>
+        <button id="toKissees" style="display:none;">Kissees</button>
+        <button id="toSettings" style="display:none;">Settings</button>
+    </nav>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+    <script type="module" src="main.js"></script>
 </body>
 
 </html>
