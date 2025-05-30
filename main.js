@@ -446,3 +446,17 @@ toSettingsBtn.onclick = (e) => {
 soundImage.addEventListener('click', () => {
     playClickSound();
 });
+
+navigator.serviceWorker.addEventListener('message', (event) => {
+  if (event.data?.type === 'PUSH_IN_FOREGROUND') {
+    const { title, body, icon } = event.data.payload;
+
+    // Show notification manually
+    if (Notification.permission === 'granted') {
+      new Notification(title, {
+        body,
+        icon,
+      });
+    }
+  }
+});
