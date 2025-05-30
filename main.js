@@ -72,7 +72,7 @@ auth.onAuthStateChanged(function (user) {
         getUserMessagingData(user).then(payload => {
             registerMessaging(async (token) => {
                 tokenDisplay.textContent = `FCM token: ${token}`;
-                var secret = payload ? payload.secret : undefined;
+                let secret = payload ? payload.secret : undefined;
                 if (!payload || payload.token !== token) {
                     const safeEmail = encodeEmail(user.email);
                     const tokenRef = db.collection("fcmTokens").doc(safeEmail);
@@ -249,7 +249,7 @@ function createKisseeListItem(doc, fromUser) {
             return;
         }
         sendMessage(kissee.email,
-            message === "" ? "A kissy from " + fromUser.displayName : message).then(() => {
+            message === "" ? "😘" : message).then(() => {
                 playClickSound();
             }).catch(err => {
                 console.error("Error sending kissy:", err);
@@ -264,49 +264,91 @@ function createKisseeListItem(doc, fromUser) {
     messageBox.style.display = "none";
     messageBox.style.marginLeft = "1rem";
 
+    let unsubscribeSent = null;
+    let unsubscribeReceived = null;
+
     viewBtn.onclick = async () => {
         messageBox.innerHTML = "";
         messageBox.style.display = messageBox.style.display === "none" ? "block" : "none";
-        var safeToEmail = encodeEmail(kissee.email)
-        var safeFromEmail = encodeEmail(fromUser.email)
-        const messages = [];
+        if (messageBox.style.display === "none") {
+            if (unsubscribeSent) unsubscribeSent();
+            if (unsubscribeReceived) unsubscribeReceived();
+            return;
+        }
+        let safeToEmail = encodeEmail(kissee.email)
+        let safeFromEmail = encodeEmail(fromUser.email)
 
-        const sentSnap = await db.collection("users")
+        const sentRef = await db.collection("users")
             .doc(safeFromEmail)
             .collection("kissees")
             .doc(safeToEmail)
             .collection("messages")
-            .orderBy("sentAt")
-            .get();
+            .orderBy("sentAt");
 
-        const receivedSnap = await db.collection("users")
+        const receivedRef = await db.collection("users")
             .doc(safeToEmail)
             .collection("kissees")
             .doc(safeFromEmail)
             .collection("messages")
-            .orderBy("sentAt")
-            .get();
+            .orderBy("sentAt");
 
-        sentSnap.forEach(doc => messages.push({ ...doc.data(), direction: "sent" }));
-        receivedSnap.forEach(doc => messages.push({ ...doc.data(), direction: "received" }));
+        let sentMessages = null;
+        let receivedMessages = null;
 
-        viewBtn.textContent = messageBox.style.display === "none" ? "View Kissies" : `View Kissies(${messages.length})`;
-        // Sort all messages by sentAt
-        messages.sort((a, b) => a.sentAt.toMillis() - b.sentAt.toMillis());
+        const renderMessages = (messages) => {
+            messageBox.innerHTML = "";
+            messages.forEach(msg => {
+                const sentAt = msg.sentAt?.toDate();
+                const timeString = sentAt ? sentAt.toLocaleString() : '';
 
-        messages.forEach(msg => {
-
-            const sentAt = msg.sentAt?.toDate();
-            const timeString = sentAt ? sentAt.toLocaleString() : '';
-
-            const messageEl = document.createElement('div');
-            messageEl.innerHTML = `
+                const messageEl = document.createElement('div');
+                messageEl.innerHTML = `
                 <div class="message">
-                <div>${msg.direction === "sent" ? "You" : "Kissee"}: ${msg.body}</div>
+                <div>${msg.direction === "sent" ? "Kissee" : "You"}: ${msg.body}</div>
                 <small style="color: gray; font-size: 0.75em;">${timeString}</small>
                 </div>
             `;
-            messageBox.appendChild(messageEl);
+                messageBox.appendChild(messageEl);
+            });
+        }
+
+        const updateUI = () => {
+            if (sentMessages === null || receivedMessages === null) {
+                return;
+            }
+            const allMessages = [...sentMessages, ...receivedMessages];
+            allMessages.sort((a, b) => {
+                const timeA = a.sentAt?.toMillis?.() ?? 0;
+                const timeB = b.sentAt?.toMillis?.() ?? 0;
+                return timeA - timeB;
+            });
+            
+            viewBtn.textContent = messageBox.style.display === "none" ? "View Kissies" : `View Kissies (${allMessages.length})`;
+            renderMessages(allMessages);
+        };
+
+        unsubscribeSent = sentRef.onSnapshot(snapshot => {
+            if (sentMessages === null) {
+                sentMessages = [];
+            }
+            sentMessages = snapshot.docs.map(doc => ({
+                id: doc.id,
+                direction: "sent",
+                ...doc.data()
+            }));
+            updateUI();
+        });
+
+        unsubscribeReceived = receivedRef.onSnapshot(snapshot => {
+            if (receivedMessages === null) {
+                receivedMessages = [];
+            }
+            receivedMessages = snapshot.docs.map(doc => ({
+                id: doc.id,
+                direction: "received",
+                ...doc.data()
+            }));
+            updateUI();
         });
     };
 
@@ -314,7 +356,6 @@ function createKisseeListItem(doc, fromUser) {
     li.appendChild(viewBtn);
     li.appendChild(messageBox);
     kisseeListEl.appendChild(li);
-
 }
 /// Kissees END ///
 
@@ -359,7 +400,7 @@ if ('Notification' in window && Notification.permission !== 'granted') {
 // ---------- Messaging END ---------- ///
 
 // Navigation
-var currentSection = "home";
+let currentSection = "home";
 function navigateTo(section) {
     navigateFrom(currentSection);
     switch (section) {
