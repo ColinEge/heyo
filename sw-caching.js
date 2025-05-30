@@ -1,3 +1,4 @@
+// v1.0.2
 var staticCacheName = "pwa-v1";
 
 var filesToCache = [
